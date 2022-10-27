@@ -119,14 +119,14 @@ for i in $genus/ncbi_dataset/data/*/*.fna; do kraken2-build --add-to-library $i 
 #<Culex spp>
 genus=culex
 datasets download genome taxon $genus --dehydrated --filename $genus.zip 
-unzip aedes.zip -d $genus
+unzip $genus.zip -d $genus
 datasets rehydrate --directory $genus
 for i in $genus/ncbi_dataset/data/*/*.fna; do kraken2-build --add-to-library $i --db $DBNAME; done
 
 #<Wolbachia spp>
 genus=wolbachia
 datasets download genome taxon $genus --dehydrated --filename $genus.zip 
-unzip aedes.zip -d $genus
+unzip $genus.zip -d $genus
 datasets rehydrate --directory $genus
 for i in $genus/ncbi_dataset/data/*/*.fna; do kraken2-build --add-to-library $i --db $DBNAME; done
 
