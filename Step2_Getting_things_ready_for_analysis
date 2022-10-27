@@ -1,5 +1,5 @@
 #This step describes the method for installing necessary programs to run the analysis on MinIon seqeuencing data. 
-
+#Please cite each software appropriately
 #installing the tools necessary for bioinformatics tool installation:
 sudo apt update
 sudo apt install make
@@ -7,8 +7,49 @@ sudo apt install build-essential
 sudo apt-get install libz-dev
 
 #Go to the wokring directory:
-cd /path/to/your/home/direcotry
-
+WDIR=/path/to/your/home/direcotry
+basedir=/path/to/your/home/local
+cd $WDIR
 #This is where you would install the bioinformatics tools:
 
-#Starting with R-base
+#Starting with R-base #R is a statistical language needed for analysis of the results and visualization
+#Instructions to install R-base is documented here: https://cran.r-project.org/bin/linux/ubuntu/fullREADME.html
+
+#update indices
+sudo apt update -qq
+sudo apt install --no-install-recommends software-properties-common dirmngr
+wget -qO- https://cloud.r-project.org/bin/linux/ubuntu/marutter_pubkey.asc | sudo tee -a /etc/apt/trusted.gpg.d/cran_ubuntu_key.asc
+#add the R 4.0 repo from CRAN -- adjust 'focal' to 'groovy' or 'bionic' as needed
+sudo add-apt-repository "deb https://cloud.r-project.org/bin/linux/ubuntu $(lsb_release -cs)-cran40/"
+sudo apt install --no-install-recommends r-base
+#Setting up the R packages li path for writable one
+echo "export R_LIBS_USER=$basedir/Renviron" >> ~/.bashrc
+#now restart the terminal
+
+#Check R is in your path
+which R
+
+#Installing minimap2 - a long read aligner
+#Instructions are on the github page:
+git clone https://github.com/lh3/minimap2
+cd minimap2 && make
+echo "export PATH=$basedir/../direcotry/minimap2$PATH" >> ~/.bashrc #wiritning the pathway export to bashrc to mount it automatically
+
+#Installing kraken2 
+git clone https://github.com/DerrickWood/kraken2.git
+cd kraken2
+KRAKEN2_DIR=$basedir/bin
+./install_kraken2.sh $KRAKEN2_DIR
+
+#Installing centrifuge
+git clone https://github.com/infphilo/centrifuge
+cd centrifuge
+make
+sudo make install prefix=$basedir
+
+
+
+
+
+
+
