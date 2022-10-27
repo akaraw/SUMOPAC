@@ -100,6 +100,11 @@ datasets download genome taxon anopheles --dehydrated --filename anopheles.zip #
 unzip anopheles.zip -d anopheles
 datasets rehydrate --directory anopheles #This will run for a while (30 to 100 mnutes depending on the connection speed)
 
+datasets download genome taxon aedes --dehydrated --filename aedes.zip --assembly-level complete
+unzip aedes.zip -d aedes
+datasets rehydrate --directory aedes
+
+
 
 
 
