@@ -74,16 +74,22 @@ which kraken2
 which centrifuge
 which minimap2
 
+#######################################################################
+#Install NCBI Blast tools for Kraken2 repeat masking steps - dustmasker
+#######################################################################
+wget https://ftp.ncbi.nlm.nih.gov/blast/executables/LATEST/ncbi-blast-2.13.0+-x64-linux.tar.gz
+tar zxvpf ncbi-blast-2.*+-x64-linux.tar.gz
+echo "export PATH=$basedir/ncbi-blast-2.13.0+-x64-linux:$PATH" >> ~/.bashrc
 
 ##################################
 #Installing KRAKEN2 db for viruses
 ##################################
 
 DBNAME=$basedir/kraken2
-kraken2-build --download-library viral --db $DBNAME
+kraken2-build --download-taxonomy --db $DBNAME
 
 kraken2-build --download-library viral --db $DBNAME
-#if above command give you an error, please read here https://github.com/DerrickWood/kraken2/issues/508 if necessary
+#if above command give you an error, please read here https://github.com/DerrickWood/kraken2/issues/508
 
 #######################################################################################################################
 #Now lets dwonload some more genomes for vectors (mozies) as per the instrcution below:
@@ -96,13 +102,35 @@ which datasets # will give you the path to executables
 #IF you see the path, it is working
 #now lets download some data
 
+#<Anopheles spp>
+genus=anopheles
 datasets download genome taxon anopheles --dehydrated --filename anopheles.zip #--assembly-level complete #Once this is completed
 unzip anopheles.zip -d anopheles
 datasets rehydrate --directory anopheles #This will run for a while (30 to 100 mnutes depending on the connection speed)
+for i in $genus/ncbi_dataset/data/*/*.fna; do kraken2-build --add-to-library $i --db $basedir/kraken; done
 
-datasets download genome taxon aedes --dehydrated --filename aedes.zip --assembly-level complete
-unzip aedes.zip -d aedes
-datasets rehydrate --directory aedes
+#<Aedes spp>
+genus=aedes
+datasets download genome taxon $genus --dehydrated --filename $genus.zip --assembly-level complete
+unzip aedes.zip -d $genus
+datasets rehydrate --directory $genus
+for i in $genus/ncbi_dataset/data/*/*.fna; do kraken2-build --add-to-library $i --db $DBNAME; done
+
+#<Culex spp>
+genus=culex
+datasets download genome taxon $genus --dehydrated --filename $genus.zip 
+unzip aedes.zip -d $genus
+datasets rehydrate --directory $genus
+for i in $genus/ncbi_dataset/data/*/*.fna; do kraken2-build --add-to-library $i --db $DBNAME; done
+
+#<Wolbachia spp>
+genus=wolbachia
+datasets download genome taxon $genus --dehydrated --filename $genus.zip 
+unzip aedes.zip -d $genus
+datasets rehydrate --directory $genus
+for i in $genus/ncbi_dataset/data/*/*.fna; do kraken2-build --add-to-library $i --db $DBNAME; done
+
+
 
 
 
