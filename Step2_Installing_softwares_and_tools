@@ -79,7 +79,7 @@ which minimap2
 #######################################################################
 wget https://ftp.ncbi.nlm.nih.gov/blast/executables/LATEST/ncbi-blast-2.13.0+-x64-linux.tar.gz
 tar zxvpf ncbi-blast-2.*+-x64-linux.tar.gz
-echo "export PATH=$basedir/ncbi-blast-2.13.0+-x64-linux:$PATH" >> ~/.bashrc
+echo "export PATH=$basedir/ncbi-blast-2.13.0+-x64-linux/bin:$PATH" >> ~/.bashrc
 
 ##################################
 #Installing KRAKEN2 db for viruses
@@ -107,7 +107,7 @@ genus=anopheles
 datasets download genome taxon anopheles --dehydrated --filename anopheles.zip #--assembly-level complete #Once this is completed
 unzip anopheles.zip -d anopheles
 datasets rehydrate --directory anopheles #This will run for a while (30 to 100 mnutes depending on the connection speed)
-for i in $genus/ncbi_dataset/data/*/*.fna; do kraken2-build --add-to-library $i --db $basedir/kraken; done
+for i in $genus/ncbi_dataset/data/*/*.fna; do kraken2-build --add-to-library $i --db $DBNAME; done
 
 #<Aedes spp>
 genus=aedes
