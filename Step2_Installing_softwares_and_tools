@@ -144,6 +144,7 @@ cat $basedir/*/ncbi_dataset/data/*/*.fna $DBNAME/library/viral/library.fna > all
 which minimap2 #if minimap2 executable is not in your path, please export it to your current path see above --> export PATH=$basedir/minimap2/:$PATH
 #Then build the minimap index using six threads
 minimap2 -t 6 -k 10 -w 8 -d all_vir_wol_moz.mmi all_vir_wol_moz.fa #Use samller kmer size for long Nanopore direct RNAseq reads : ref https://github.com/lh3/minimap2#map-long-genomic
+#The above command will create the indexed file for subsequent analysis
 
 
 
