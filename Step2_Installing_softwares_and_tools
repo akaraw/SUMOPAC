@@ -84,14 +84,23 @@ tar zxvpf ncbi-blast-2.*+-x64-linux.tar.gz
 echo "export PATH=$basedir/ncbi-blast-2.13.0+-x64-linux/bin:$PATH" >> ~/.bashrc
 
 ##################################
+#Installing KRAKEN2 db for bacteria
+##################################
+
+DBNAMEBAC=$basedir/kraken2bac
+kraken2-build --threads 6 --download-taxonomy --db $DBNAMEBAC
+kraken2-build --threads 6 --download-library bacteria --db $DBNAMEBAC
+kraken2-build --threads 6 --threads 6 --build --db $DBNAMEBAC
+#if above command give you an error, please read here https://github.com/DerrickWood/kraken2/issues/508
+
+##################################
 #Installing KRAKEN2 db for viruses
 ##################################
 
-DBNAME=$basedir/kraken2
-kraken2-build --download-taxonomy --db $DBNAME
-
-kraken2-build --download-library viral --db $DBNAME
-#if above command give you an error, please read here https://github.com/DerrickWood/kraken2/issues/508
+DBNAME=$basedir/kraken2vir
+kraken2-build --threads 6 --download-taxonomy --db $DBNAME
+kraken2-build --threads 6 --download-library viral --db $DBNAME
+kraken2-build --threads 6 --threads 6 --build --db $DBNAME
 
 #######################################################################################################################
 #Now lets dwonload some more genomes for vectors (mozies) as per the instrcution below:
@@ -99,7 +108,13 @@ kraken2-build --download-library viral --db $DBNAME
 #Follow the instruction here for linux installation https://www.ncbi.nlm.nih.gov/datasets/docs/v2/download-and-install/
 #Once it is installed:
 #######################################################################################################################
-which datasets # will give you the path to executables
+DBNAME=$basedir/kraken2vec
+kraken2-build --threads 6 --download-taxonomy --db $DBNAME
+kraken2-build --threads 6 --download-library viral --db $DBNAME
+kraken2-build --threads 6 --threads 6 --build --db $DBNAME
+
+#Using NCBI datasets tools
+which datasets #will give you the path to executables
 
 #IF you see the path, it is working
 #now lets download some data
@@ -116,26 +131,23 @@ genus=aedes
 datasets download genome taxon $genus --dehydrated --filename $genus.zip --assembly-level complete
 unzip $genus.zip -d $genus
 datasets rehydrate --directory $genus
-for i in $genus/ncbi_dataset/data/*/*.fna; do kraken2-build --add-to-library $i --db $DBNAME; done
+for i in $genus/ncbi_dataset/data/*/*.fna; do kraken2-build --threads 6 --add-to-library $i --db $DBNAME; done
 
 #<Culex spp>
 genus=culex
 datasets download genome taxon $genus --dehydrated --filename $genus.zip 
 unzip $genus.zip -d $genus
 datasets rehydrate --directory $genus
-for i in $genus/ncbi_dataset/data/*/*.fna; do kraken2-build --add-to-library $i --db $DBNAME; done
+for i in $genus/ncbi_dataset/data/*/*.fna; do kraken2-build --threads 6 --add-to-library $i --db $DBNAME; done
 conda deactivate
 #<Wolbachia spp>
 genus=wolbachia
 datasets download genome taxon $genus --dehydrated --filename $genus.zip 
 unzip $genus.zip -d $genus
 datasets rehydrate --directory $genus
-for i in $genus/ncbi_dataset/data/*/*.fna; do kraken2-build --add-to-library $i --db $DBNAME; done
+for i in $genus/ncbi_dataset/data/*/*.fna; do kraken2-build --threads 6 --add-to-library $i --db $DBNAME; done
 
-#This is optional
-#<dengue>
-#genus=dengue
-#datasets download genome taxon 'dengue virus' --dehydrated --filename $genus.zip --assembly-level complete
+kraken2-build --threads 6 --build --db $DBNAME
 
 ##############################################################################################################
 #Now lets concatenate all the target seqeucnes into one large on so that we can make an index for the minimap2
@@ -145,7 +157,7 @@ ls */ncbi_dataset/data/*/*.fna | wc -l
 cat $basedir/*/ncbi_dataset/data/*/*.fna $DBNAME/library/viral/library.fna > all_vir_wol_moz.fa
 which minimap2 #if minimap2 executable is not in your path, please export it to your current path see above --> export PATH=$basedir/minimap2/:$PATH
 #Then build the minimap index using six threads
-minimap2 -t 6 -k 10 -w 8 -d all_vir_wol_moz.mmi all_vir_wol_moz.fa #Use samller kmer size for long Nanopore direct RNAseq reads : ref https://github.com/lh3/minimap2#map-long-genomic
+minimap2 -t 6 -k 13 -w 11 -d all_vir_wol_moz.mmi all_vir_wol_moz.fa #Use samller kmer size for long Nanopore direct RNAseq reads : ref https://github.com/lh3/minimap2#map-long-genomic
 #The above command will create the indexed file for subsequent analysis
 
 
