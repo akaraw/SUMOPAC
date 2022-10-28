@@ -88,7 +88,7 @@ sed -n '1~4s/^@/>/p;2~4p' rna2dna_all.fastq > rna2dna_all.fasta
 
 PAF=out.paf
 #Now run minimap2
-minimap2 -t $CPUS -uf -ax  all.fasta > $PAF
+minimap2 -t $CPUS -uf -x  all.fasta > $PAF
 
 if [ -s "$PAF" ]; then
     ./paf_reader.R $PAF $WDIR
