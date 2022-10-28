@@ -21,8 +21,8 @@ cd $basedir #This is where you would install the bioinformatics tools:
 ###############################################################################################################
 
 #update indices
-sudo apt update -qq
-sudo apt install --no-install-recommends software-properties-common dirmngr
+sudo apt update -qq\
+sudo apt install --no-install-recommends software-properties-common dirmngr\
 wget -qO- https://cloud.r-project.org/bin/linux/ubuntu/marutter_pubkey.asc | sudo tee -a /etc/apt/trusted.gpg.d/cran_ubuntu_key.asc
 
 #add the R 4.0 repo from CRAN -- adjust 'focal' to 'groovy' or 'bionic' as needed
