@@ -41,7 +41,7 @@ which R
 
 git clone https://github.com/lh3/minimap2
 cd minimap2 && make
-echo "export PATH=$basedir/../direcotry/minimap2:$PATH" >> ~/.bashrc #wiritning the pathway export to bashrc to mount it automatically
+echo "export PATH=$basedir/minimap2:$PATH" >> ~/.bashrc #wiritning the pathway export to bashrc to mount it automatically
 
 ###################
 #Installing kraken2
@@ -122,7 +122,7 @@ datasets download genome taxon $genus --dehydrated --filename $genus.zip
 unzip $genus.zip -d $genus
 datasets rehydrate --directory $genus
 for i in $genus/ncbi_dataset/data/*/*.fna; do kraken2-build --add-to-library $i --db $DBNAME; done
-
+conda deactivate
 #<Wolbachia spp>
 genus=wolbachia
 datasets download genome taxon $genus --dehydrated --filename $genus.zip 
@@ -130,8 +130,20 @@ unzip $genus.zip -d $genus
 datasets rehydrate --directory $genus
 for i in $genus/ncbi_dataset/data/*/*.fna; do kraken2-build --add-to-library $i --db $DBNAME; done
 
+#This is optional
+#<dengue>
+#genus=dengue
+#datasets download genome taxon 'dengue virus' --dehydrated --filename $genus.zip --assembly-level complete
 
-
+##############################################################################################################
+#Now lets concatenate all the target seqeucnes into one large on so that we can make an index for the minimap2
+##############################################################################################################
+#Total number of seqeunces
+ls */ncbi_dataset/data/*/*.fna | wc -l
+cat $basedir/*/ncbi_dataset/data/*/*.fna $DBNAME/library/viral/library.fna > all_vir_wol_moz.fa
+which minimap2 #if minimap2 executable is not in your path, please export it to your current path see above --> export PATH=$basedir/minimap2/:$PATH
+#Then build the minimap index using six threads
+minimap2 -t 6 -k 10 -w 8 -d all_vir_wol_moz.mmi all_vir_wol_moz.fa #Use samller kmer size for long Nanopore direct RNAseq reads : ref https://github.com/lh3/minimap2#map-long-genomic
 
 
 
