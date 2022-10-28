@@ -1,5 +1,4 @@
-STep 2
-######
+**Step 2**
 
 #################################################################################################################
 #This step describes the method for installing necessary programs to run the analysis on MinIon seqeuencing data. 
