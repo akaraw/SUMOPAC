@@ -86,8 +86,15 @@ seqkit seq --rna2dna all.fastq > rna2dna_all.fastq
 sed -n '1~4s/^@/>/p;2~4p' rna2dna_all.fastq > rna2dna_all.fasta
 #rm rna2dna_all.fastq
 
+PAF=out.paf
 #Now run minimap2
-minimap2 -t $CPUS -uf -ax  all.fasta > out.paf
+minimap2 -t $CPUS -uf -ax  all.fasta > $PAF
+
+if [ -s "$PAF" ]; then
+    ./paf_reader.R $PAF $WDIR
+else
+    echo "$PAF is empty.. exiting minimap2 analysis"
+fi
 
 
 
