@@ -95,18 +95,3 @@ if [ -s "$PAF" ]; then
 else
     echo "$PAF is empty.. exiting minimap2 analysis"
 fi
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
