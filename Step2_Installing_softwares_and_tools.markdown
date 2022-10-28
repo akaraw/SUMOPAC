@@ -49,9 +49,9 @@ echo "export PATH=$basedir/minimap2:$PATH" >> ~/.bashrc #wiritning the pathway e
 #Installing kraken2
 ###################
 
-git clone https://github.com/DerrickWood/kraken2.git
-cd kraken2
-KRAKEN2_DIR=$basedir/bin
+git clone https://github.com/DerrickWood/kraken2.git \
+cd kraken2\
+KRAKEN2_DIR=$basedir/bin\
 ./install_kraken2.sh $KRAKEN2_DIR
 
 ######################
