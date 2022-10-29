@@ -36,6 +36,19 @@ echo "export R_LIBS_USER=$basedir/Renviron" >> ~/.bashrc
 #Check R is in your path
 which R
 
+#Now open the R terminal open
+#Type
+R
+Sys.setenv(R_LIBS_USER="/mnt/c/Users/kar131/lib")
+Sys.getenv("R_LIBS_USER")
+dir.exists(Sys.getenv("R_LIBS_USER"))
+.libPaths(Sys.getenv("R_LIBS_USER"))
+#Sys.setenv(R_PROFILE_USER="/mnt/c/Users/kar131/.Rprofile")
+#Sys.getenv("R_PROFILE_USER")
+#c(Sys.getenv("R_PROFILE_USER"), file.path(getwd(),".Rprofile"))
+#file.edit("/mnt/c/Users/kar131/.Rprofile") #Once the text edit is open, press i get into editor mode and then copy and pase > .libPaths(Sys.getenv("R_LIBS_USER"))
+
+
 ###########################################
 #Installing minimap2 - a long read aligner
 #Instructions are on the github page:
