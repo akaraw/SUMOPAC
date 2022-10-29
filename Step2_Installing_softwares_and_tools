@@ -149,7 +149,8 @@ for i in $genus/ncbi_dataset/data/*/*.fna; do kraken2-build --threads 6 --add-to
 
 kraken2-build --threads 6 --build --db $DBNAME
 
-
+#Additional references
+#https://cran.r-project.org/web/packages/fs/vignettes/function-comparisons.html
 
 
 
