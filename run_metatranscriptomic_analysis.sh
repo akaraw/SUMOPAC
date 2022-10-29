@@ -26,7 +26,7 @@ fi
 
 sampledir=$1
 WDIR=$2 
-basedir=$3
+basedir=$3 #This is same as step2
 CPUS=$4
 DBNAME=$6
 MMI=$7
@@ -71,11 +71,13 @@ if [ -s "all.fastq" ]; then
     echo "Omitting fastq concatenation"
 else
     cat $sdir/*.fastq > all.fastq
+    FQ=all.fastq
 fi
 
-if [ -s "all.fastq" ]; then #if the file is not empty
+if [ -s "$FQ" ]; then #if the file is not empty
   echo "Some data present to work with"
 else
+  echo "There is an empty fastq"
   exit 2 2> /dev/null #if the file is empty
 fi
 
@@ -88,12 +90,12 @@ fi
 
 #minimap2 run - viruses
 PAF=out_vir.paf
-LIB=
+LIB=$basedir/kraken2vir/library/viral/library.fna
 #Now run minimap2
-minimap2 -t $CPUS -uf -x  all.fasta > $PAF
+minimap2 -t $CPUS -k 13 -x map-ont  $LIB $FQ > $PAF #Smaller k-mer for direct RNA seq data from ONT
 
 if [ -s "$PAF" ]; then
-    ./paf_reader.R $PAF $WDIR
+    ./paf_reader.R $PAF $WDIR #This is a Rscript
 else
     echo "$PAF is empty.. exiting minimap2 analysis"
     rm $PAF
@@ -101,4 +103,15 @@ fi
 
 #minimap2 run - bacteria
 
+PAF=out_bac.paf
+LIB=$basedir/kraken2bac/library/bacteria/library.fna
+#Now run minimap2
+minimap2 -t $CPUS -k 13 -x map-ont  $LIB $FQ > $PAF
+
+if [ -s "$PAF" ]; then
+    ./paf_reader.R $PAF $WDIR
+else
+    echo "$PAF is empty.. exiting minimap2 analysis"
+    rm $PAF
+fi
 
