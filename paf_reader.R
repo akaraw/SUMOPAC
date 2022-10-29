@@ -3,6 +3,11 @@ args = commandArgs(trailingOnly=TRUE)
 paf <- args[1]
 wdir <- args[2]
 
+Sys.setenv(R_LIBS_USER="/mnt/c/Users/kar131/lib")
+Sys.getenv("R_LIBS_USER")
+dir.exists(Sys.getenv("R_LIBS_USER"))
+.libPaths(Sys.getenv("R_LIBS_USER"))
+
 packages <- c("pafr", "ggplot2", "ggpubr")
 install.packages(setdiff(packages, rownames(installed.packages())), lib = "/mnt/c/Users/kar131/lib")
 
