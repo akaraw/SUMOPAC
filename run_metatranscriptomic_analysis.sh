@@ -82,11 +82,13 @@ fi
 ##################################################################
 #module load sekit #Run seqkit tool
 #seqkit sample -p 0.1 all.fastq > test.fastq
-seqkit seq --rna2dna all.fastq > rna2dna_all.fastq
-sed -n '1~4s/^@/>/p;2~4p' rna2dna_all.fastq > rna2dna_all.fasta
+#seqkit seq --rna2dna all.fastq > rna2dna_all.fastq
+#sed -n '1~4s/^@/>/p;2~4p' rna2dna_all.fastq > rna2dna_all.fasta
 #rm rna2dna_all.fastq
 
-PAF=out.paf
+#minimap2 run - viruses
+PAF=out_vir.paf
+LIB=
 #Now run minimap2
 minimap2 -t $CPUS -uf -x  all.fasta > $PAF
 
@@ -94,4 +96,9 @@ if [ -s "$PAF" ]; then
     ./paf_reader.R $PAF $WDIR
 else
     echo "$PAF is empty.. exiting minimap2 analysis"
+    rm $PAF
 fi
+
+#minimap2 run - bacteria
+
+
