@@ -179,6 +179,9 @@ unzip anopheles.zip -d anopheles
 datasets rehydrate --directory anopheles #This will run for a while (30 to 100 mnutes depending on the connection speed)
 for i in $genus/ncbi_dataset/data/*/*.fna; do kraken2-build --add-to-library $i --db $DBNAME; done
 echo "$genus added to the database"
+#For minimap2
+cat $genus/ncbi_dataset/data/*/*.fna > $basedir/$genus.vec.fa
+
 
 #<Aedes spp>
 genus=aedes
@@ -188,6 +191,7 @@ unzip $genus.zip -d $genus
 datasets rehydrate --directory $genus
 for i in $genus/ncbi_dataset/data/*/*.fna; do kraken2-build --threads 6 --add-to-library $i --db $DBNAME; done
 echo "$genus added to the database"
+cat $genus/ncbi_dataset/data/*/*.fna > $basedir/$genus.vec.fa
 
 #<Culex spp>
 genus=culex
@@ -197,6 +201,11 @@ unzip $genus.zip -d $genus
 datasets rehydrate --directory $genus
 for i in $genus/ncbi_dataset/data/*/*.fna; do kraken2-build --threads 6 --add-to-library $i --db $DBNAME; done
 echo "$genus added to the database"
+cat $genus/ncbi_dataset/data/*/*.fna > $basedir/$genus.vec.fa
+
+cat $basedir/*.vec.fa > $basedir/minimap2_vec.all.fa
+MINIVEC=$basedir/minimap2_vec.all.fa
+rm $basedir/*.vec.fa
 
 #<Wolbachia spp>
 #genus=wolbachia
