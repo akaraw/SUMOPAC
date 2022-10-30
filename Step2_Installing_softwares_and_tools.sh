@@ -1,4 +1,5 @@
-**Step 2**
+#!/bin/bash
+#**Step 2**
 
 #################################################################################################################
 #This step describes the method for installing necessary programs to run the analysis on MinIon seqeuencing data. 
@@ -13,7 +14,8 @@ sudo apt-get install libz-dev
 basedir=/path/to/your/home/local
 
 #Go to the <basedir>:
-cd $basedir #This is where you would install the bioinformatics tools:
+echo "#This is where you would install the bioinformatics tools: (Need approximately 1tb of space)"
+cd $basedir #This is where you would install the bioinformatics tools: (Need approximately 1tb of space)
 
 ###############################################################################################################
 #Starting with R-base #R is a statistical language needed for analysis of the results and visualization
@@ -29,25 +31,29 @@ wget -qO- https://cloud.r-project.org/bin/linux/ubuntu/marutter_pubkey.asc | sud
 sudo add-apt-repository "deb https://cloud.r-project.org/bin/linux/ubuntu $(lsb_release -cs)-cran40/"
 sudo apt install --no-install-recommends r-base
 
-#Setting up the R packages li path for writable one
-echo "export R_LIBS_USER=$basedir/Renviron" >> ~/.bashrc
-#now restart the terminal
+if ! command -v Rscript &> /dev/null
+then
+    echo "R could not be found. Please install R"
+    exit 1
+else
+    echo "R found - proceediong to the next step"    
+fi
+  
+if ! command -v git &> /dev/null
+then
+    echo "git could not be found. Please install git"
+    exit 1
+else
+    echo "git found - proceediong to the next step"    
+fi
 
-#Check R is in your path
-which R
-
-#Now open the R terminal open
-#Type
-R
-Sys.setenv(R_LIBS_USER="/mnt/c/Users/kar131/lib")
-Sys.getenv("R_LIBS_USER")
-dir.exists(Sys.getenv("R_LIBS_USER"))
-.libPaths(Sys.getenv("R_LIBS_USER"))
-#Sys.setenv(R_PROFILE_USER="/mnt/c/Users/kar131/.Rprofile")
-#Sys.getenv("R_PROFILE_USER")
-#c(Sys.getenv("R_PROFILE_USER"), file.path(getwd(),".Rprofile"))
-#file.edit("/mnt/c/Users/kar131/.Rprofile") #Once the text edit is open, press i get into editor mode and then copy and pase > .libPaths(Sys.getenv("R_LIBS_USER"))
-
+if ! command -v make &> /dev/null
+then
+    echo "make could not be found. Please install"
+    exit 1
+else
+    echo "make found - proceediong to the next step"    
+fi
 
 ###########################################
 #Installing minimap2 - a long read aligner
@@ -67,27 +73,42 @@ cd kraken2
 KRAKEN2_DIR=$basedir/bin
 ./install_kraken2.sh $KRAKEN2_DIR
 
-######################
-#Installing centrifuge
-######################
+#################################
+#Installing centrifuge - optional
+#################################
 
-git clone https://github.com/infphilo/centrifuge
-cd centrifuge
-make
-sudo make install prefix=$basedir
+#git clone https://github.com/infphilo/centrifuge
+#cd centrifuge
+#make
+#sudo make install prefix=$basedir
 
 
 #####################################################################################################################
 #Finally you need to mount all the executable paths into ./bashrc so that next time when start the Ubuntu terminal, \
 #it will automatically export the paths to the executables 
 #####################################################################################################################
-echo "export PATH=$basedir:$PATH" >> ~/.bashrc
+
+echo "export PATH=$basedir/bin:$PATH" >> ~/.bashrc
 #Then restart the terminal
 #Now you can test your installation
 #The below will show you the path to executables if they are exported
-which kraken2
-which centrifuge
-which minimap2
+
+if ! command -v minimap2 &> /dev/null
+then
+    echo "minimap2 could not be found. Please install"
+    exit 1
+else
+    echo "minimap2 found - checking kraken2"    
+fi
+
+if ! command -v kraken2 &> /dev/null
+then
+    echo "kraken2 could not be found. Please install"
+    exit 1
+else
+    echo "minimap2 found - now installing NCBI Blast"    
+fi
+
 
 #######################################################################
 #Install NCBI Blast tools for Kraken2 repeat masking steps - dustmasker
@@ -96,14 +117,22 @@ wget https://ftp.ncbi.nlm.nih.gov/blast/executables/LATEST/ncbi-blast-2.13.0+-x6
 tar zxvpf ncbi-blast-2.*+-x64-linux.tar.gz
 echo "export PATH=$basedir/ncbi-blast-2.13.0+-x64-linux/bin:$PATH" >> ~/.bashrc
 
+if ! command -v dustmasker > /dev/null; then
+  echo "dustmasker is not in the path. Please check the installation"
+  exit 1
+else
+  echo "dustmasker is installed"
+  echo " Creating KRAKEN databses"
+fi
+
 ##################################
 #Installing KRAKEN2 db for bacteria
 ##################################
 
 DBBAC=$basedir/kraken2bac
-kraken2-build --threads 6 --download-taxonomy --db $DBNAMEBAC
-kraken2-build --threads 6 --download-library bacteria --db $DBNAMEBAC
-kraken2-build --threads 6 --threads 6 --build --db $DBNAMEBAC
+kraken2-build --threads 6 --download-taxonomy --db $DBBAC
+kraken2-build --threads 6 --download-library bacteria --db $DBBAC
+kraken2-build --threads 6 --threads 6 --build --db $DBBAC
 #if above command give you an error, please read here https://github.com/DerrickWood/kraken2/issues/508
 
 #Since the bacterial library is quite large, it is better to create anindex of the lib for the minimap2 run as follows
@@ -116,9 +145,9 @@ minimap2 -k 13 -t 12 -d $INDEX $LIB
 ##################################
 
 DBVIR=$basedir/kraken2vir
-kraken2-build --threads 6 --download-taxonomy --db $DBNAME
-kraken2-build --threads 6 --download-library viral --db $DBNAME
-kraken2-build --threads 6 --threads 6 --build --db $DBNAME
+kraken2-build --threads 6 --download-taxonomy --db $DBVIR
+kraken2-build --threads 6 --download-library viral --db $DBVIR
+kraken2-build --threads 6 --threads 6 --build --db $DBVIR
 
 #######################################################################################################################
 #Now lets dwonload some more genomes for vectors (mozies) as per the instrcution below:
@@ -127,9 +156,17 @@ kraken2-build --threads 6 --threads 6 --build --db $DBNAME
 #Once it is installed:
 #######################################################################################################################
 DBVEC=$basedir/kraken2vec
-kraken2-build --threads 6 --download-taxonomy --db $DBNAME
+kraken2-build --threads 6 --download-taxonomy --db $DBVEC
 
 #Using NCBI datasets tools
+if ! command -v datasets > /dev/null
+then
+  echo "Datasets command not found - installing to $basedir/bin"
+  wget https://ftp.ncbi.nlm.nih.gov/pub/datasets/command-line/v2/linux-amd64/datasets -O $basedir/bin/datasets
+else
+  echo "datasets command found - downloading data ..."
+fi
+
 which datasets #will give you the path to executables
 
 #IF you see the path, it is working
