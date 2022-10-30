@@ -1,7 +1,9 @@
 #!/bin/bash
+echo -e "\
 ###########################################
 # DIRECT RNA SEQ ANALYSIS PIPELINE ACK V1 #
 ###########################################
+"
 if [ "$1" == "-h"]; then
     echo "Usage: run_analysis.sh <sample dir> <work dir> <Basedir> <threads>"
     exit 0
@@ -71,16 +73,16 @@ fi
 if [ -s "all.fastq" ]; then
     echo "Omitting fastq concatenation"
 else
-    cat $sdir/*.fastq > all.fastq
+    cat $sdir/*.fastq > $WDIR/all.fastq
     FQ=all.fastq
 fi
 
 if [ -s "$FQ" ]; then #if the file is not empty
   echo "Some data present to work with"
 else
-  echo "There is an empty fastq"
+  echo "This is an empty fastq"
   exit 2 2> /dev/null #if the file is empty
-fi
+fi8
 
 ##################################################################
 #module load sekit #Run seqkit tool
@@ -90,13 +92,14 @@ fi
 #rm rna2dna_all.fastq
 
 #minimap2 run - viruses
-PAF=out_vir.paf
+PAF=$WDIR/ut_vir.paf
 LIB=$basedir/kraken2vir/library/viral/library.fna
+OUTFILE=$WDIR/minimap2_virus.csv 
 #Now run minimap2
 minimap2 -t $CPUS -k 13 -x map-ont  $LIB $FQ > $PAF #Smaller k-mer for direct RNA seq data from ONT
 
 if [ -s "$PAF" ]; then
-    ./paf_reader.R $PAF $WDIR #This is a Rscript
+    ./paf_reader.R $PAF $WDIR  $OUTFILE #This is a Rscript
 else
     echo "$PAF is empty.. exiting minimap2 analysis"
     rm $PAF
@@ -104,13 +107,14 @@ fi
 
 #minimap2 run - bacteria
 
-PAF=out_bac.paf
+PAF=$WDIR/out_bac.paf
 LIB=$basedir/bac.mmi #This is created in step 2
+OUTFILE=$WDIR/minimap2_bacteria.csv
 #Now run minimap2
 minimap2 -t $CPUS -k 13 -x map-ont  $LIB $FQ > $PAF
 
 if [ -s "$PAF" ]; then
-    ./paf_reader.R $PAF $WDIR
+    ./paf_reader.R $PAF $WDIR $OUTFILE
 else
     echo "$PAF is empty.. exiting minimap2 analysis"
     rm $PAF
@@ -122,27 +126,28 @@ DBVIR=$basedir/kraken2vir
 DBVEC=$basedir/kraken2vec
 
 if [ -s "$DBBAC" ]; then
-kraken2 --threads 12 --quick --output bac.txt --use-names --db $DBBAC all.fastq
+    kraken2 --threads 12 --quick --output $WDIR/kraken2bac.txt --use-names --db $DBBAC all.fastq
 else
-echo "Can not locate $DBBAC for kraken2"
+    echo "Can not locate $DBBAC for kraken2"
+    exit 1
 fi
 
 if [ -s "$DBVIR" ]; then
-kraken2 --threads 12 --quick --output bac.txt --use-names --db $DBVIR all.fastq
+    kraken2 --threads 12 --quick --output $WDIR/kraken2vir.txt --use-names --db $DBVIR all.fastq
 else
-echo "$DBVIR does not exist"
-exit 1
+    echo -e "$DBVIR does not exist"
+    exit 1
 fi
 
 if [ -s "$DBVEC" ]; then
-kraken2 --threads 12 --quick --output bac.txt --use-names --db $DBBAC all.fastq
+    kraken2 --threads 12 --quick --output $WDIR/kraken2vec.txt --use-names --db $DBVEC all.fastq
 else
-echo "Can not locate $DBVEC for kraken2"
-exit 1
+    echo -e "Can not locate $DBVEC for kraken2"
+    exit 1
 fi
 
-echo "Pipeline is now completed - bye \
-cheers - Anjana"
+echo -e "Pipeline is now completed - \nCherio!!!"
+
 
 
 
