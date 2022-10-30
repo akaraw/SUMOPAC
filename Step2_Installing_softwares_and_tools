@@ -100,14 +100,14 @@ echo "export PATH=$basedir/ncbi-blast-2.13.0+-x64-linux/bin:$PATH" >> ~/.bashrc
 #Installing KRAKEN2 db for bacteria
 ##################################
 
-DBNAMEBAC=$basedir/kraken2bac
+DBBAC=$basedir/kraken2bac
 kraken2-build --threads 6 --download-taxonomy --db $DBNAMEBAC
 kraken2-build --threads 6 --download-library bacteria --db $DBNAMEBAC
 kraken2-build --threads 6 --threads 6 --build --db $DBNAMEBAC
 #if above command give you an error, please read here https://github.com/DerrickWood/kraken2/issues/508
 
 #Since the bacterial library is quite large, it is better to create anindex of the lib for the minimap2 run as follows
-LIB=$DBNAMEBAC/bacteria/library.fna
+LIB=$DBBAC/bacteria/library.fna
 $INDEX=$basedir/bac.mmi
 minimap2 -k 13 -t 12 -d $INDEX $LIB
 
@@ -115,7 +115,7 @@ minimap2 -k 13 -t 12 -d $INDEX $LIB
 #Installing KRAKEN2 db for viruses
 ##################################
 
-DBNAME=$basedir/kraken2vir
+DBVIR=$basedir/kraken2vir
 kraken2-build --threads 6 --download-taxonomy --db $DBNAME
 kraken2-build --threads 6 --download-library viral --db $DBNAME
 kraken2-build --threads 6 --threads 6 --build --db $DBNAME
@@ -126,10 +126,8 @@ kraken2-build --threads 6 --threads 6 --build --db $DBNAME
 #Follow the instruction here for linux installation https://www.ncbi.nlm.nih.gov/datasets/docs/v2/download-and-install/
 #Once it is installed:
 #######################################################################################################################
-DBNAME=$basedir/kraken2vec
+DBVEC=$basedir/kraken2vec
 kraken2-build --threads 6 --download-taxonomy --db $DBNAME
-kraken2-build --threads 6 --download-library viral --db $DBNAME
-kraken2-build --threads 6 --threads 6 --build --db $DBNAME
 
 #Using NCBI datasets tools
 which datasets #will give you the path to executables
@@ -137,35 +135,43 @@ which datasets #will give you the path to executables
 #IF you see the path, it is working
 #now lets download some data
 
-#<Anopheles spp>
 genus=anopheles
+echo "Downloadng $genus.... We will let you know when this is done."
 datasets download genome taxon anopheles --dehydrated --filename anopheles.zip #--assembly-level complete #Once this is completed
 unzip anopheles.zip -d anopheles
 datasets rehydrate --directory anopheles #This will run for a while (30 to 100 mnutes depending on the connection speed)
 for i in $genus/ncbi_dataset/data/*/*.fna; do kraken2-build --add-to-library $i --db $DBNAME; done
+echo "$genus added to the database"
 
 #<Aedes spp>
 genus=aedes
+echo "Downloadng $genus.... We will let you know when this is done."
 datasets download genome taxon $genus --dehydrated --filename $genus.zip --assembly-level complete
 unzip $genus.zip -d $genus
 datasets rehydrate --directory $genus
 for i in $genus/ncbi_dataset/data/*/*.fna; do kraken2-build --threads 6 --add-to-library $i --db $DBNAME; done
+echo "$genus added to the database"
 
 #<Culex spp>
 genus=culex
+echo "Downloadng $genus.... We will let you know when this is done."
 datasets download genome taxon $genus --dehydrated --filename $genus.zip 
 unzip $genus.zip -d $genus
 datasets rehydrate --directory $genus
 for i in $genus/ncbi_dataset/data/*/*.fna; do kraken2-build --threads 6 --add-to-library $i --db $DBNAME; done
-conda deactivate
+echo "$genus added to the database"
+
 #<Wolbachia spp>
-genus=wolbachia
-datasets download genome taxon $genus --dehydrated --filename $genus.zip 
-unzip $genus.zip -d $genus
-datasets rehydrate --directory $genus
-for i in $genus/ncbi_dataset/data/*/*.fna; do kraken2-build --threads 6 --add-to-library $i --db $DBNAME; done
+#genus=wolbachia
+#datasets download genome taxon $genus --dehydrated --filename $genus.zip 
+#unzip $genus.zip -d $genus
+#datasets rehydrate --directory $genus
+#for i in $genus/ncbi_dataset/data/*/*.fna; do kraken2-build --threads 6 --add-to-library $i --db $DBNAME; done
 
 kraken2-build --threads 6 --build --db $DBNAME
 
 #Additional references
 #https://cran.r-project.org/web/packages/fs/vignettes/function-comparisons.html
+
+echo "Now the pipeline is set up on your computer"
+echo "Run analysis using <run_analysis.sh> script"
