@@ -3,7 +3,7 @@
 # DIRECT RNA SEQ ANALYSIS PIPELINE ACK V1 #
 ###########################################
 if [ "$1" == "-h"]; then
-    echo "Usage: run_metatranscriptomic_analysis.sh <sample dir> <work dir> <Basedir> <threads>"
+    echo "Usage: run_analysis.sh <sample dir> <work dir> <Basedir> <threads>"
     exit 0
 fi
 
