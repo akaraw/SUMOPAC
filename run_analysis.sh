@@ -82,7 +82,7 @@ if [ -s "$FQ" ]; then #if the file is not empty
 else
   echo "This is an empty fastq"
   exit 2 2> /dev/null #if the file is empty
-fi8
+fi
 
 ##################################################################
 #module load sekit #Run seqkit tool
@@ -92,7 +92,7 @@ fi8
 #rm rna2dna_all.fastq
 
 #minimap2 run - viruses
-PAF=$WDIR/ut_vir.paf
+PAF=$WDIR/out_vir.paf
 LIB=$basedir/kraken2vir/library/viral/library.fna
 OUTFILE=$WDIR/minimap2_virus.csv 
 #Now run minimap2
@@ -112,6 +112,21 @@ LIB=$basedir/bac.mmi #This is created in step 2
 OUTFILE=$WDIR/minimap2_bacteria.csv
 #Now run minimap2
 minimap2 -t $CPUS -k 13 -x map-ont  $LIB $FQ > $PAF
+
+if [ -s "$PAF" ]; then
+    ./paf_reader.R $PAF $WDIR $OUTFILE
+else
+    echo "$PAF is empty.. exiting minimap2 analysis"
+    rm $PAF
+fi
+
+#minimap2 run - vector
+
+PAF=$WDIR/out_vec.paf
+MINIVEC=$basedir/minimap2_vec.all.fa
+OUTFILE=$WDIR/minimap2_bacteria.csv
+#Now run minimap2
+minimap2 -t $CPUS -k 13 -x map-ont  $MINIVEC $FQ > $PAF
 
 if [ -s "$PAF" ]; then
     ./paf_reader.R $PAF $WDIR $OUTFILE
