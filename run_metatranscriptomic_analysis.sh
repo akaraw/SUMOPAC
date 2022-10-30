@@ -1,8 +1,12 @@
 #!/bin/bash
-
 ###########################################
 # DIRECT RNA SEQ ANALYSIS PIPELINE ACK V1 #
 ###########################################
+if [ "$1" == "-h"]; then
+    echo "Usage: run_metatranscriptomic_analysis.sh <sample dir> <work dir> <Basedir> <threads>"
+    exit 0
+fi
+
 #First we need to setup the executables we installed in step 2 to be avaible in the pathway
 #If they are already not: export PATH=/path/to/executables:$PATH
 #This script will not run if the executables are not in the current path (contact Anjana for help; anjana.karawita@csiro.au)
@@ -15,6 +19,8 @@ then
     echo "minimap2 could not be found..\
     exiting"
     exit 1 2> /dev/null
+else
+    echo "minimap2 found - proceeding to next step ..."
 fi
 
 if ! command -v kraken2 &> /dev/null
@@ -22,14 +28,14 @@ then
     echo "kraken2 could not be found\
           Please export to the current path"
     exit 1
+else
+    echo "kraken2 found - proceediong to next step"    
 fi
 
 sampledir=$1
 WDIR=$2 
 basedir=$3 #This is same as step2
 CPUS=$4
-DBNAME=$6
-MMI=$7
 
 if [ -z $1 ]; then
   echo " Please provide all varibales required "
@@ -46,11 +52,6 @@ fi
 if [ -z $4 ]; then
   echo "Setting threads to 1"
   CPUS=1
-fi
-
-if [ -z $7 ]; then
-  echo "Using custom minimap2 index assuming it is in the current $WDIR"
-  DBNAME=all_vir_wol_moz.mmi
 fi
 
 cd $WDIR
@@ -104,7 +105,7 @@ fi
 #minimap2 run - bacteria
 
 PAF=out_bac.paf
-LIB=$basedir/kraken2bac/library/bacteria/library.fna
+LIB=$basedir/bac.mmi #This is created in step 2
 #Now run minimap2
 minimap2 -t $CPUS -k 13 -x map-ont  $LIB $FQ > $PAF
 
@@ -114,4 +115,34 @@ else
     echo "$PAF is empty.. exiting minimap2 analysis"
     rm $PAF
 fi
+
+echo "--- Now running Kraken2 ---"
+DBBAC=$basedir/kraken2bac
+DBVIR=$basedir/kraken2vir
+DBVEC=$basedir/kraken2vec
+
+if [ -s "$DBBAC" ]; then
+kraken2 --threads 12 --quick --output bac.txt --use-names --db $DBBAC all.fastq
+else
+echo "Can not locate $DBBAC for kraken2"
+fi
+
+if [ -s "$DBVIR" ]; then
+kraken2 --threads 12 --quick --output bac.txt --use-names --db $DBVIR all.fastq
+else
+echo "$DBVIR does not exist"
+exit 1
+fi
+
+if [ -s "$DBVEC" ]; then
+kraken2 --threads 12 --quick --output bac.txt --use-names --db $DBBAC all.fastq
+else
+echo "Can not locate $DBVEC for kraken2"
+exit 1
+fi
+
+echo "Pipeline is now completed - bye \
+cheers - Anjana"
+
+
 
