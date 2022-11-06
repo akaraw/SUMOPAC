@@ -70,7 +70,7 @@ else
 fi
 
 #Concatenate all fastq files
-if [ -s "all.fastq" ]; then
+if [ -s "$WDIR/all.fastq" ]; then
     echo "Omitting fastq concatenation"
 else
     cat $sdir/*.fastq > $WDIR/all.fastq
@@ -99,7 +99,7 @@ OUTFILE=$WDIR/minimap2_virus.csv
 minimap2 -t $CPUS -k 13 -x map-ont  $LIB $FQ > $PAF #Smaller k-mer for direct RNA seq data from ONT
 
 if [ -s "$PAF" ]; then
-    ./paf_reader.R $PAF $WDIR  $OUTFILE #This is a Rscript
+    $basedir/paf_reader.R $PAF $WDIR  $OUTFILE #This is a Rscript
 else
     echo "$PAF is empty.. exiting minimap2 analysis"
     rm $PAF
@@ -114,7 +114,7 @@ OUTFILE=$WDIR/minimap2_bacteria.csv
 minimap2 -t $CPUS -k 13 -x map-ont  $LIB $FQ > $PAF
 
 if [ -s "$PAF" ]; then
-    ./paf_reader.R $PAF $WDIR $OUTFILE
+    $basedir/paf_reader.R $PAF $WDIR $OUTFILE
 else
     echo "$PAF is empty.. exiting minimap2 analysis"
     rm $PAF
@@ -124,12 +124,12 @@ fi
 
 PAF=$WDIR/out_vec.paf
 MINIVEC=$basedir/minimap2_vec.all.fa
-OUTFILE=$WDIR/minimap2_bacteria.csv
+OUTFILE=$WDIR/minimap2_vec.csv
 #Now run minimap2
-minimap2 -t $CPUS -k 13 -x map-ont  $MINIVEC $FQ > $PAF
+minimap2 -t $CPUS -x map-ont  $MINIVEC $FQ > $PAF #Change the -k option if needed
 
 if [ -s "$PAF" ]; then
-    ./paf_reader.R $PAF $WDIR $OUTFILE
+    $basedir/paf_reader.R $PAF $WDIR $OUTFILE
 else
     echo "$PAF is empty.. exiting minimap2 analysis"
     rm $PAF
