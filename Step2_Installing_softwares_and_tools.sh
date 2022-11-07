@@ -11,10 +11,13 @@ sudo apt update
 sudo apt install make
 sudo apt install build-essential
 sudo apt-get install libz-dev
-basedir=/path/to/your/home/local
+basedir=$1
 
 #Go to the <basedir>:
-echo "#This is where you would install the bioinformatics tools: (Need approximately 1tb of space)"
+echo "#This is where you would install the bioinformatics tools: $basedir (Need approximately 1tb of space)"
+echo "If the $basedir does not exit, we will create it"
+
+mkdir -p $basedir
 cd $basedir #This is where you would install the bioinformatics tools: (Need approximately 1tb of space)
 
 ###############################################################################################################
@@ -52,7 +55,7 @@ then
     echo "make could not be found. Please install"
     exit 1
 else
-    echo "make found - proceediong to the next step"    
+    echo "make found - proceeding to the next step"    
 fi
 
 ###########################################
