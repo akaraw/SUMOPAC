@@ -137,7 +137,7 @@ kraken2-build --threads 6 --threads 6 --build --db $DBBAC
 
 #Since the bacterial library is quite large, it is better to create anindex of the lib for the minimap2 run as follows
 LIB=$DBBAC/library/bacteria/library.fna
-TAXMAP=$basedir/tax_bac.map
+TAXMAP=$basedir/bactaxmap.tab
 grep ">"  $LIB | sed 's/>.*|//g' | cut -d" " -f1,2,3,4 | sed -r 's/\s+/\t/' > $TAXMAP
 $INDEX=$basedir/bac.mmi
 minimap2 -k 13 -t 12 -d $INDEX $LIB
@@ -152,7 +152,7 @@ kraken2-build --threads 6 --download-library viral --db $DBVIR
 kraken2-build --threads 6 --threads 6 --build --db $DBVIR
 
 LIB=$DBVIR/library/viral/library.fna
-TAXMAP=$basedir/tax_vir.map
+TAXMAP=$basedir/virtaxmap.tab
 grep ">"  $LIB | sed 's/>.*|//g' | cut -d" " -f1,2,3,4 | sed -r 's/\s+/\t/' > $TAXMAP
 
 #######################################################################################################################
