@@ -131,8 +131,8 @@ fi
 #######################################################################
 wget https://ftp.ncbi.nlm.nih.gov/blast/executables/LATEST/ncbi-blast-2.13.0+-x64-linux.tar.gz -O $basedir/ncbi-blast-2.13.0+-x64-linux.tar.gz
 tar zxvpf $basedir/ncbi-blast-2.*+-x64-linux.tar.gz --directory $basedir
-echo "export PATH=$basedir/ncbi-blast-2.13.0+-x64-linux/bin:$PATH" >> ~/.bashrc
-export PATH=$basedir/ncbi-blast-2.13.0+-x64-linux/bin:$PATH
+echo "export PATH=$basedir/ncbi-blast-2.13.0+/bin:$PATH" >> ~/.bashrc
+export PATH=$basedir/ncbi-blast-2.13.0+/bin:$PATH
 
 if ! command -v dustmasker > /dev/null; then
   echo "dustmasker is not in the path. Please check the installation"
