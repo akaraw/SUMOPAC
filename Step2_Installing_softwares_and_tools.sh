@@ -74,7 +74,7 @@ if ! command -v minimap2 &> /dev/null
 then
     git clone https://github.com/lh3/minimap2
     cd minimap2 && make
-    echo "export PATH=$basedir/minimap2:$PATH" >> ~/.bashrc #wiritning the pathway export to bashrc to mount it automatically
+    echo "export PATH=$basedir/minimap2/minimap2:$PATH" >> ~/.bashrc #wiritning the pathway export to bashrc to mount it automatically
     export PATH=$basedir/minimap2:$PATH
 fi
 
