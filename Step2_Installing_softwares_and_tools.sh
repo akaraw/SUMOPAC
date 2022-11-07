@@ -83,7 +83,7 @@ fi
 ###################
 if ! command -v kraken2 &> /dev/null
 then
-    git clone https://github.com/DerrickWood/kraken2.git 
+    git clone https://github.com/akaraw/kraken2.git 
     cd kraken2
     KRAKEN2_DIR=$basedir/bin
     ./install_kraken2.sh $KRAKEN2_DIR
@@ -129,10 +129,13 @@ fi
 #######################################################################
 #Install NCBI Blast tools for Kraken2 repeat masking steps - dustmasker
 #######################################################################
-wget https://ftp.ncbi.nlm.nih.gov/blast/executables/LATEST/ncbi-blast-2.13.0+-x64-linux.tar.gz -O $basedir/ncbi-blast-2.13.0+-x64-linux.tar.gz
-tar zxvpf $basedir/ncbi-blast-2.*+-x64-linux.tar.gz --directory $basedir
-echo "export PATH=$basedir/ncbi-blast-2.13.0+/bin:$PATH" >> ~/.bashrc
-export PATH=$basedir/ncbi-blast-2.13.0+/bin:$PATH
+if ! command -v dustmasker > /dev/null; then
+    echo "dustmasker is not in the path. We are wokring on it"
+    wget https://ftp.ncbi.nlm.nih.gov/blast/executables/LATEST/ncbi-blast-2.13.0+-x64-linux.tar.gz -O $basedir/ncbi-blast-2.13.0+-x64-linux.tar.gz
+    tar zxvpf $basedir/ncbi-blast-2.*+-x64-linux.tar.gz --directory $basedir
+    echo "export PATH=$basedir/ncbi-blast-2.13.0+/bin:$PATH" >> ~/.bashrc
+    export PATH=$basedir/ncbi-blast-2.13.0+/bin:$PATH
+fi
 
 if ! command -v dustmasker > /dev/null; then
   echo "dustmasker is not in the path. Please check the installation"
@@ -150,6 +153,7 @@ DBBAC=$basedir/kraken2bac
 kraken2-build --threads 6 --download-taxonomy --db $DBBAC
 kraken2-build --threads 6 --download-library bacteria --db $DBBAC
 kraken2-build --threads 6 --threads 6 --build --db $DBBAC
+
 #if above command give you an error, please read here https://github.com/DerrickWood/kraken2/issues/508
 
 #Since the bacterial library is quite large, it is better to create anindex of the lib for the minimap2 run as follows
@@ -190,11 +194,6 @@ else
   echo "datasets command found - downloading data ..."
 fi
 
-which datasets #will give you the path to executables
-
-#IF you see the path, it is working
-#now lets download some data
-
 genus=anopheles
 echo "Downloadng $genus.... We will let you know when this is done."
 datasets download genome taxon anopheles --dehydrated --filename anopheles.zip #--assembly-level complete #Once this is completed
@@ -202,6 +201,7 @@ unzip anopheles.zip -d anopheles
 datasets rehydrate --directory anopheles #This will run for a while (30 to 100 mnutes depending on the connection speed)
 for i in $genus/ncbi_dataset/data/*/*.fna; do kraken2-build --add-to-library $i --db $DBNAME; done
 echo "$genus added to the database"
+
 #For minimap2
 cat $genus/ncbi_dataset/data/*/*.fna > $basedir/$genus.vec.fa
 grep ">" $basedir/$genus.vec.fa | sed 's/>//g' | cut -d" " -f1,2,3,4 | sed -r 's/\s+/\t/' > $genus.vectaxmap.tab
@@ -215,6 +215,8 @@ unzip $genus.zip -d $genus
 datasets rehydrate --directory $genus
 for i in $genus/ncbi_dataset/data/*/*.fna; do kraken2-build --threads 6 --add-to-library $i --db $DBNAME; done
 echo "$genus added to the database"
+
+#For minimap2
 cat $genus/ncbi_dataset/data/*/*.fna > $basedir/$genus.vec.fa
 grep ">" $basedir/$genus.vec.fa | sed 's/>//g' | cut -d" " -f1,2,3,4 | sed -r 's/\s+/\t/' > $basedir/$genus.vectaxmap.tab
 
@@ -226,6 +228,8 @@ unzip $genus.zip -d $genus
 datasets rehydrate --directory $genus
 for i in $genus/ncbi_dataset/data/*/*.fna; do kraken2-build --threads 6 --add-to-library $i --db $DBNAME; done
 echo "$genus added to the database"
+
+#For minimap2
 cat $genus/ncbi_dataset/data/*/*.fna > $basedir/$genus.vec.fa
 grep ">" $basedir/$genus.vec.fa | sed 's/>//g' | cut -d" " -f1,2,3,4 | sed -r 's/\s+/\t/' > $basedir/$genus.vectaxmap.tab
 
