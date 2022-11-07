@@ -25,21 +25,24 @@ cd $basedir #This is where you would install the bioinformatics tools: (Need app
 #Instructions to install R-base is documented here: https://cran.r-project.org/bin/linux/ubuntu/fullREADME.html
 ###############################################################################################################
 
-#update indices
-sudo apt update -qq
-sudo apt install --no-install-recommends software-properties-common dirmngr
-wget -qO- https://cloud.r-project.org/bin/linux/ubuntu/marutter_pubkey.asc | sudo tee -a /etc/apt/trusted.gpg.d/cran_ubuntu_key.asc
+if ! command -v Rscript &> /dev/null
+then
+    #update indices
+    sudo apt update -qq
+    sudo apt install --no-install-recommends software-properties-common dirmngr
+    wget -qO- https://cloud.r-project.org/bin/linux/ubuntu/marutter_pubkey.asc | sudo tee -a /etc/apt/trusted.gpg.d/cran_ubuntu_key.asc
 
-#add the R 4.0 repo from CRAN -- adjust 'focal' to 'groovy' or 'bionic' as needed
-sudo add-apt-repository "deb https://cloud.r-project.org/bin/linux/ubuntu $(lsb_release -cs)-cran40/"
-sudo apt install --no-install-recommends r-base
+    #add the R 4.0 repo from CRAN -- adjust 'focal' to 'groovy' or 'bionic' as needed
+    sudo add-apt-repository "deb https://cloud.r-project.org/bin/linux/ubuntu $(lsb_release -cs)-cran40/"
+    sudo apt install --no-install-recommends r-base
+fi
 
 if ! command -v Rscript &> /dev/null
 then
     echo "R could not be found. Please install R"
     exit 1
 else
-    echo "R found - proceediong to the next step"    
+    echo "R found - proceeding to the next step"    
 fi
   
 if ! command -v git &> /dev/null
@@ -66,6 +69,7 @@ fi
 git clone https://github.com/lh3/minimap2
 cd minimap2 && make
 echo "export PATH=$basedir/minimap2:$PATH" >> ~/.bashrc #wiritning the pathway export to bashrc to mount it automatically
+export PATH=$basedir/minimap2:$PATH
 
 ###################
 #Installing kraken2
@@ -92,6 +96,7 @@ KRAKEN2_DIR=$basedir/bin
 #####################################################################################################################
 
 echo "export PATH=$basedir/bin:$PATH" >> ~/.bashrc
+export PATH=$basedir/bin:$PATH
 #Then restart the terminal
 #Now you can test your installation
 #The below will show you the path to executables if they are exported
@@ -119,6 +124,7 @@ fi
 wget https://ftp.ncbi.nlm.nih.gov/blast/executables/LATEST/ncbi-blast-2.13.0+-x64-linux.tar.gz
 tar zxvpf ncbi-blast-2.*+-x64-linux.tar.gz
 echo "export PATH=$basedir/ncbi-blast-2.13.0+-x64-linux/bin:$PATH" >> ~/.bashrc
+export PATH=$basedir/ncbi-blast-2.13.0+-x64-linux/bin:$PATH
 
 if ! command -v dustmasker > /dev/null; then
   echo "dustmasker is not in the path. Please check the installation"
