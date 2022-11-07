@@ -99,7 +99,7 @@ OUTFILE=$WDIR/minimap2_virus.csv
 minimap2 -t $CPUS -k 13 -x map-ont  $LIB $FQ > $PAF #Smaller k-mer for direct RNA seq data from ONT
 
 if [ -s "$PAF" ]; then
-    $basedir/paf_reader.R $PAF $WDIR  $OUTFILE #This is a Rscript
+    $basedir/paf_reader.R $PAF $WDIR  $OUTFILE $VIRTAX 11 #This is a Rscript
 else
     echo "$PAF is empty.. exiting minimap2 analysis"
     rm $PAF
@@ -114,7 +114,7 @@ OUTFILE=$WDIR/minimap2_bacteria.csv
 minimap2 -t $CPUS -k 13 -x map-ont  $LIB $FQ > $PAF
 
 if [ -s "$PAF" ]; then
-    $basedir/paf_reader.R $PAF $WDIR $OUTFILE
+    $basedir/paf_reader.R $PAF $WDIR $OUTFILE $BACTAX 11
 else
     echo "$PAF is empty.. exiting minimap2 analysis"
     rm $PAF
@@ -129,7 +129,7 @@ OUTFILE=$WDIR/minimap2_vec.csv
 minimap2 -t $CPUS -x map-ont  $MINIVEC $FQ > $PAF #Change the -k option if needed
 
 if [ -s "$PAF" ]; then
-    $basedir/paf_reader.R $PAF $WDIR $OUTFILE
+    $basedir/paf_reader.R $PAF $WDIR $OUTFILE $VECTAX 30
 else
     echo "$PAF is empty.. exiting minimap2 analysis"
     rm $PAF
