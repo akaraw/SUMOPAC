@@ -142,7 +142,7 @@ if ! command -v dustmasker > /dev/null; then
   exit 1
 else
   echo "dustmasker is installed"
-  echo " Creating KRAKEN databses"
+  echo "Creating KRAKEN databses"
 fi
 
 ##################################
