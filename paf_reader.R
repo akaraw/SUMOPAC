@@ -3,8 +3,10 @@ args = commandArgs(trailingOnly=TRUE)
 paf <- args[1]
 wdir <- args[2]
 outfile <- args[3]
+taxmap <- args[4]
+N <- args[5]
 
-Sys.setenv(R_LIBS_USER="/mnt/c/Users/kar131/lib")
+Sys.setenv(R_LIBS_USER="/mnt/c/Users/kar131/lib") #Your custom library location
 Sys.getenv("R_LIBS_USER")
 dir.exists(Sys.getenv("R_LIBS_USER"))
 .libPaths(Sys.getenv("R_LIBS_USER"))
@@ -29,20 +31,21 @@ ali <- read_paf(paf)
 #print(dv)
 #dev.off()
 
-by_q <- aggregate(dv ~ qname, data=ali, FUN=mean)
-knitr::kable(by_q)
-
-by_t <- aggregate(dv ~ tname, data=ali, FUN=mean)
-knitr::kable(by_t)
-
 prim_alignment <- filter_secondary_alignments(ali)
 df <- as.data.frame(prim_alignment)
-write.csv(df, outfile, quote = F, row.names = F)
+df <- df[order(df$s1, decreasing = T),]
+head(df)
+substrRight <- function(x, n){
+  substr(x, nchar(x)-n+1, nchar(x))
+}
 
-#nrow(ali) - nrow(prim_alignment)
+df$tname <- substrRight(df$tname, N)
+tx <- read.table(taxmap, sep = "\t")
+colnames(tx) <- c("tname", "spp")
+MM <- merge(df, tx, by = "tname", all.x = T, all.y = F)
+MM <- MM[order(MM$s1, decreasing = T),]
+head(MM, 20)
 
-#pdf("dotplot_primary.pdf", width = 6, height = 6)
-#p <- dotplot(prim_alignment, label_seqs=TRUE, order_by="qstart") + theme_bw()
-#print(p)
-#dev.off()
+write.csv(MM, outfile, quote = F, row.names = F)
+
 q()
