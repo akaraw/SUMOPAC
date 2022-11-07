@@ -136,7 +136,9 @@ kraken2-build --threads 6 --threads 6 --build --db $DBBAC
 #if above command give you an error, please read here https://github.com/DerrickWood/kraken2/issues/508
 
 #Since the bacterial library is quite large, it is better to create anindex of the lib for the minimap2 run as follows
-LIB=$DBBAC/bacteria/library.fna
+LIB=$DBBAC/library/bacteria/library.fna
+TAXMAP=$basedir/tax_bac.map
+grep ">"  $LIB | sed 's/>.*|//g' | cut -d" " -f1,2,3,4 | sed -r 's/\s+/\t/' > $TAXMAP
 $INDEX=$basedir/bac.mmi
 minimap2 -k 13 -t 12 -d $INDEX $LIB
 
@@ -148,6 +150,10 @@ DBVIR=$basedir/kraken2vir
 kraken2-build --threads 6 --download-taxonomy --db $DBVIR
 kraken2-build --threads 6 --download-library viral --db $DBVIR
 kraken2-build --threads 6 --threads 6 --build --db $DBVIR
+
+LIB=$DBVIR/library/viral/library.fna
+TAXMAP=$basedir/tax_vir.map
+grep ">"  $LIB | sed 's/>.*|//g' | cut -d" " -f1,2,3,4 | sed -r 's/\s+/\t/' > $TAXMAP
 
 #######################################################################################################################
 #Now lets dwonload some more genomes for vectors (mozies) as per the instrcution below:
@@ -181,6 +187,7 @@ for i in $genus/ncbi_dataset/data/*/*.fna; do kraken2-build --add-to-library $i 
 echo "$genus added to the database"
 #For minimap2
 cat $genus/ncbi_dataset/data/*/*.fna > $basedir/$genus.vec.fa
+grep ">" $basedir/$genus.vec.fa | sed 's/>//g' | cut -d" " -f1,2,3,4 | sed -r 's/\s+/\t/' > $genus.vectaxmap.tab
 
 
 #<Aedes spp>
@@ -192,6 +199,7 @@ datasets rehydrate --directory $genus
 for i in $genus/ncbi_dataset/data/*/*.fna; do kraken2-build --threads 6 --add-to-library $i --db $DBNAME; done
 echo "$genus added to the database"
 cat $genus/ncbi_dataset/data/*/*.fna > $basedir/$genus.vec.fa
+grep ">" $basedir/$genus.vec.fa | sed 's/>//g' | cut -d" " -f1,2,3,4 | sed -r 's/\s+/\t/' > $basedir/$genus.vectaxmap.tab
 
 #<Culex spp>
 genus=culex
@@ -202,10 +210,13 @@ datasets rehydrate --directory $genus
 for i in $genus/ncbi_dataset/data/*/*.fna; do kraken2-build --threads 6 --add-to-library $i --db $DBNAME; done
 echo "$genus added to the database"
 cat $genus/ncbi_dataset/data/*/*.fna > $basedir/$genus.vec.fa
+grep ">" $basedir/$genus.vec.fa | sed 's/>//g' | cut -d" " -f1,2,3,4 | sed -r 's/\s+/\t/' > $basedir/$genus.vectaxmap.tab
 
 cat $basedir/*.vec.fa > $basedir/minimap2_vec.all.fa
 MINIVEC=$basedir/minimap2_vec.all.fa
 rm $basedir/*.vec.fa
+cat $basedir/*.vectaxmap.tab > $basedir/vectaxmap.tab
+rm cat $basedir/*.vectaxmap.tab
 
 #<Wolbachia spp>
 #genus=wolbachia
