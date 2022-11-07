@@ -40,7 +40,7 @@ basedir=$3 #This is same as step2
 CPUS=$4
 
 VECTAX=$basedir/vectaxmap.tab
-BACTAX=$basedir/bacctaxmap.tab
+BACTAX=$basedir/bactaxmap.tab
 VIRTAX=$basedir/virtaxmap.tab
 
 if [ -z $1 ]; then
