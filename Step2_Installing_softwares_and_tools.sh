@@ -6,15 +6,20 @@
 #Please cite each software appropriately                                                                          
 #installing the bioinformatics tools                                                                              
 #################################################################################################################
-
-sudo apt update
-sudo apt install make
-sudo apt install build-essential
-sudo apt-get install libz-dev
 basedir=$1
 
+if ! command -v make; then
+    echo "make is not installed, now installing"
+    sudo apt update
+    sudo apt install make
+    sudo apt install build-essential
+    sudo apt-get install libz-dev
+else
+    echo "make is installed. Proceeding to next step"
+fi
+
 #Go to the <basedir>:
-echo "#This is where you would install the bioinformatics tools: $basedir (Need approximately 1tb of space)"
+echo "#This is where you wanted to install the bioinformatics tools and databases: $basedir (Need approximately 1tb of space)"
 echo "If the $basedir does not exit, we will create it"
 
 mkdir -p $basedir
@@ -65,20 +70,27 @@ fi
 #Installing minimap2 - a long read aligner
 #Instructions are on the github page:
 ###########################################
-
-git clone https://github.com/lh3/minimap2
-cd minimap2 && make
-echo "export PATH=$basedir/minimap2:$PATH" >> ~/.bashrc #wiritning the pathway export to bashrc to mount it automatically
-export PATH=$basedir/minimap2:$PATH
+if ! command -v minimap2 &> /dev/null
+then
+    git clone https://github.com/lh3/minimap2
+    cd minimap2 && make
+    echo "export PATH=$basedir/minimap2:$PATH" >> ~/.bashrc #wiritning the pathway export to bashrc to mount it automatically
+    export PATH=$basedir/minimap2:$PATH
+fi
 
 ###################
 #Installing kraken2
 ###################
+if ! command -v kraken2 &> /dev/null
+then
+    git clone https://github.com/DerrickWood/kraken2.git 
+    cd kraken2
+    KRAKEN2_DIR=$basedir/bin
+    ./install_kraken2.sh $KRAKEN2_DIR
+    echo "export PATH=$basedir/bin:$PATH" >> ~/.bashrc
+    export PATH=$basedir/bin:$PAT
+fi
 
-git clone https://github.com/DerrickWood/kraken2.git 
-cd kraken2
-KRAKEN2_DIR=$basedir/bin
-./install_kraken2.sh $KRAKEN2_DIR
 
 #################################
 #Installing centrifuge - optional
@@ -94,9 +106,6 @@ KRAKEN2_DIR=$basedir/bin
 #Finally you need to mount all the executable paths into ./bashrc so that next time when start the Ubuntu terminal, \
 #it will automatically export the paths to the executables 
 #####################################################################################################################
-
-echo "export PATH=$basedir/bin:$PATH" >> ~/.bashrc
-export PATH=$basedir/bin:$PATH
 #Then restart the terminal
 #Now you can test your installation
 #The below will show you the path to executables if they are exported
@@ -114,15 +123,14 @@ then
     echo "kraken2 could not be found. Please install"
     exit 1
 else
-    echo "minimap2 found - now installing NCBI Blast"    
+    echo "kraken2 found - now installing NCBI Blast"    
 fi
-
 
 #######################################################################
 #Install NCBI Blast tools for Kraken2 repeat masking steps - dustmasker
 #######################################################################
-wget https://ftp.ncbi.nlm.nih.gov/blast/executables/LATEST/ncbi-blast-2.13.0+-x64-linux.tar.gz
-tar zxvpf ncbi-blast-2.*+-x64-linux.tar.gz
+wget https://ftp.ncbi.nlm.nih.gov/blast/executables/LATEST/ncbi-blast-2.13.0+-x64-linux.tar.gz -O $basedir/ncbi-blast-2.13.0+-x64-linux.tar.gz
+tar zxvpf $basedir/ncbi-blast-2.*+-x64-linux.tar.gz --directory $basedir
 echo "export PATH=$basedir/ncbi-blast-2.13.0+-x64-linux/bin:$PATH" >> ~/.bashrc
 export PATH=$basedir/ncbi-blast-2.13.0+-x64-linux/bin:$PATH
 
