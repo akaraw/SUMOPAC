@@ -39,6 +39,10 @@ WDIR=$2
 basedir=$3 #This is same as step2
 CPUS=$4
 
+VECTAX=$basedir/vectaxmap.tab
+BACTAX=$basedir/bacctaxmap.tab
+VIRTAX=$basedir/virtaxmap.tab
+
 if [ -z $1 ]; then
   echo " Please provide all varibales required "
   echo " runmeta.sh <sample.dir> <workdir> <threds>"
