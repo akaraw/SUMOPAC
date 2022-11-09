@@ -88,7 +88,7 @@ then
     KRAKEN2_DIR=$basedir/bin
     ./install_kraken2.sh $KRAKEN2_DIR
     echo "export PATH=$basedir/bin:$PATH" >> ~/.bashrc
-    export PATH=$basedir/bin:$PAT
+    export PATH=$basedir/bin:$PATH
 fi
 
 
