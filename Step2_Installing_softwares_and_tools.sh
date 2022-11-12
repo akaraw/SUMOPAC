@@ -55,7 +55,7 @@ then
     echo "git could not be found. Please install git"
     exit 1
 else
-    echo "git found - proceediong to the next step"
+    echo "git found - proceeding to the next step"
 fi
 
 if ! command -v make &> /dev/null
@@ -70,12 +70,16 @@ fi
 #Installing minimap2 - a long read aligner
 #Instructions are on the github page:
 ###########################################
+export PATH=$basedir/minimap2/:$PATH
+
 if ! command -v minimap2 &> /dev/null
 then
     git clone https://github.com/lh3/minimap2
     cd minimap2 && make
     echo "export PATH=$basedir/minimap2/minimap2:$PATH" >> ~/.bashrc #wiritning the pathway export to bashrc to mount it automatically
     export PATH=$basedir/minimap2/minimap2:$PATH
+else
+        echo "minimap2 is installed"
 fi
 
 ###################
@@ -130,15 +134,15 @@ fi
 #Install NCBI Blast tools for Kraken2 repeat masking steps - dustmasker
 #######################################################################
 if ! command -v dustmasker > /dev/null; then
-        echo "dustmasker is not in the path. Please check the installation"
-        echo "We will now install it"
+        echo "dustmasker is not in the path. We will check if it is already installed in $basedir"
         if [ -d $basedir/ncbi-blast-2.13.0+/bin ]; then
-                echo "export PATH=$basedir/ncbi-blast-2.13.0+/bin:$PATH" >> ~/.bashrc
+                echo "Found it in the $basedir. Now setting in path"
                 export PATH=$basedir/ncbi-blast-2.13.0+/bin/:$PATH
         else
+                echo "Nope, it is not still downloaded in $basedir. Let's do it first and set the path"
                 wget https://ftp.ncbi.nlm.nih.gov/blast/executables/LATEST/ncbi-blast-2.13.0+-x64-linux.tar.gz -O $basedir/ncbi-blast-2.13.0+-x64-linux.tar.gz
                 tar zxvpf $basedir/ncbi-blast-2.*+-x64-linux.tar.gz --directory $basedir
-                echo "export PATH=$basedir/ncbi-blast-2.13.0+/bin:$PATH" >> ~/.bashrc
+                #echo "export PATH=$basedir/ncbi-blast-2.13.0+/bin:$PATH" >> ~/.bashrc
                 export PATH=$basedir/ncbi-blast-2.13.0+/bin/:$PATH
         fi
 else
@@ -166,11 +170,15 @@ fi
 
 #Since the bacterial library is quite large, it is better to create anindex of the lib for the minimap2 run as follows
 LIB=$DBBAC/library/bacteria/library.fna
-if ! [ -f $LIB ]; then
+INDEX=$basedir/bac.mmi
+TAXMAP=$basedir/bactaxmap.tab
+
+if ! [ -s $INDEX ]; then
+        echo "The $INDEX for minimap2 was not found. We will create it now"
         #IB=$DBBAC/library/bacteria/library.fna
-        AXMAP=$basedir/bactaxmap.tab
+        TAXMAP=$basedir/bactaxmap.tab
         grep ">"  $LIB | sed 's/>.*|//g' | cut -d" " -f1,2,3,4 | sed -r 's/\s+/\t/' > $TAXMAP
-        $INDEX=$basedir/bac.mmi
+        #$INDEX=$basedir/bac.mmi
         minimap2 -k 13 -t 12 -d $INDEX $LIB
 fi
 
@@ -202,7 +210,7 @@ DBVEC=$basedir/kraken2vec
 if ! [ -s $DBVEC/taxo.k2d ]; then
         kraken2-build --threads 6 --download-taxonomy --db $DBVEC
 else
-        echo "$DBVEV seems to be present. Skipping creating it"
+        echo "$DBVEC seems to be present. Skipping creating it"
 fi
 
 #Using NCBI datasets tools
