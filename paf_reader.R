@@ -5,6 +5,7 @@ wdir <- args[2]
 outfile <- args[3]
 taxmap <- args[4]
 N <- args[5]
+N <- as.numeric(N)
 
 Sys.setenv(R_LIBS_USER="/mnt/c/Users/kar131/lib") #Your custom library location
 Sys.getenv("R_LIBS_USER")
@@ -23,10 +24,10 @@ setwd(wdir)
 ali <- read_paf(paf)
 
 #pdf("dotplot_dv_vs_length.pdf", width = 6, height = 6)
-#dv <- ggplot(ali, aes(alen, dv)) + 
-#  geom_point(alpha=0.6, colour="steelblue", size=2) + 
+#dv <- ggplot(ali, aes(alen, dv)) +
+#  geom_point(alpha=0.6, colour="steelblue", size=2) +
 #  scale_x_continuous("Alignment length (kb)", label =  function(x) x/ 1e3) +
-#  scale_y_continuous("Per base divergence") + 
+#  scale_y_continuous("Per base divergence") +
 #  theme_pubr()
 #print(dv)
 #dev.off()
