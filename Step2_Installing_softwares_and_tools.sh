@@ -1,14 +1,20 @@
 #!/bin/bash
 #**Step 2**
-
 #################################################################################################################
 #This step describes the method for installing necessary programs to run the analysis on MinIon seqeuencing data.
 #Please cite each software appropriately
 #installing the bioinformatics tools
 #################################################################################################################
 basedir=$1
-export PATH=$basedir/bin:$PATH
-if ! command -v make; then
+if [ -s $basedir ];then
+        export PATH=$basedir/bin:$PATH
+        cd $basedir
+else
+        mkdir -p $basedir/bin
+        cd $basedir
+fi
+
+if ! command -v make &> /dev/null; then
     echo "make is not installed, now installing"
     sudo apt update
     sudo apt install make
@@ -19,12 +25,13 @@ else
 fi
 
 #Go to the <basedir>:
-echo "#This is where you wanted to install the bioinformatics tools and databases: $basedir (Need approximately 1tb of space)"
+echo "This is where you wanted to install the bioinformatics tools and databases: $basedir (Need approximately 1tb of space)"
 echo "If the $basedir does not exit, we will create it"
 
-mkdir -p $basedir
-cd $basedir #This is where you would install the bioinformatics tools: (Need approximately 1tb of space)
-
+if ! command -v seqkit &> /dev/null; then
+        wget https://github.com/shenwei356/seqkit/releases/download/v2.3.1/seqkit_linux_amd64.tar.gz
+        tar -xvzf seqkit_linux_amd64.tar.gz $baseidr/bin
+fi
 ###############################################################################################################
 #Starting with R-base #R is a statistical language needed for analysis of the results and visualization
 #Instructions to install R-base is documented here: https://cran.r-project.org/bin/linux/ubuntu/fullREADME.html
