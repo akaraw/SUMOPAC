@@ -7,7 +7,7 @@ echo -e "\
 ###########################################
 "
 if [ "$1" == "-h" ]; then
-    echo "Usage: run_analysis.sh <sample dir> <work dir> <Basedir> <threads> (RNA to DNA Y/N>"
+    echo "Usage: run_analysis.sh <sample dir> <work dir> <Basedir> <threads> <RNA to DNA Y/N>"
     exit 0
 fi
 
