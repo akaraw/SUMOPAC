@@ -21,6 +21,7 @@ sampledir=$1
 WDIR=$2
 basedir=$3 #This is same as step2
 CPUS=$4
+rna2dna=$5
 
 export PATH=$basedir/bin:$PATH
 export PATH=$basedir/minimap2:$PATH
@@ -52,7 +53,7 @@ VIRTAX=$basedir/virtaxmap.tab
 
 if [ -z $1 ]; then
   echo " Please provide all varibales required "
-  echo " runmeta.sh <sample.dir> <workdir> <threds>"
+  echo " run_analysis.sh -h for more info"
   exit 1 2> /dev/null
 fi
 
@@ -96,6 +97,12 @@ else
   exit 2 2> /dev/null #if the file is empty
 fi
 
+if [ $5 == "Y" ]; then
+    echo "Converting RNA seq to DNA seq" 
+    FQD=$WDIR/all_DNA.fq
+    seqkit seq --rna2dna $FQ > $FQD
+    FQ=$FQD
+fi
 ##################################################################
 #module load sekit #Run seqkit tool
 #seqkit sample -p 0.1 all.fastq > test.fastq
